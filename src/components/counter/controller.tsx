@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useCountStore } from "@/store/count";
+import { useDecreaseCount, useIncreaseCount } from "@/store/count";
 
 export default function Controller() {
   // ❌ 스토어 전체를 불러오면 count 변경 시에도 버튼의 불필요한 리렌더링 발생
@@ -10,7 +10,10 @@ export default function Controller() {
   // const decrease = useCountStore((store) => store.decrease);
 
   // ✅ actions 객체로 묶기
-  const { increase, decrease } = useCountStore((store) => store.actions);
+  // const { increase, decrease } = useCountStore((store) => store.actions);
+
+  const increase = useIncreaseCount();
+  const decrease = useDecreaseCount();
 
   return (
     <div>

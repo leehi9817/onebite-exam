@@ -3,15 +3,15 @@ import { create } from "zustand";
 type Store = {
   count: number;
   actions: {
-    increase: () => void;
-    decrease: () => void;
+    increaseOne: () => void;
+    decreaseOne: () => void;
   };
 };
 
 export const useCountStore = create<Store>((set, get) => ({
   count: 0,
   actions: {
-    increase: () => {
+    increaseOne: () => {
       // get 메서드 사용 예시
       // const count = get().count;
       // set({ count: count + 1 });
@@ -21,10 +21,26 @@ export const useCountStore = create<Store>((set, get) => ({
         count: store.count + 1,
       }));
     },
-    decrease: () => {
+    decreaseOne: () => {
       set((store) => ({
         count: store.count - 1,
       }));
     },
   },
 }));
+
+// 전용 커스텀 훅 사용 시 store 내부가 바뀌어도 수정 불필요
+export const useCount = () => {
+  const count = useCountStore((store) => store.count);
+  return count;
+};
+
+export const useIncreaseCount = () => {
+  const increase = useCountStore((store) => store.actions.increaseOne);
+  return increase;
+};
+
+export const useDecreaseCount = () => {
+  const decrease = useCountStore((store) => store.actions.decreaseOne);
+  return decrease;
+};
