@@ -1,24 +1,38 @@
 import { create } from "zustand";
-import { combine } from "zustand/middleware";
+import { combine, subscribeWithSelector } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 export const useCountStore = create(
-  immer(
-    combine({ count: 0 }, (set, get) => ({
-      actions: {
-        increaseOne: () => {
-          set((state) => {
-            state.count++;
-          });
+  subscribeWithSelector(
+    // ✅ immer 덕분에 직접 값을 변경하는 방식으로 작성 가능
+    immer(
+      // combine: 첫 번째 인수 = State, 두 번째 인수 = 액션 함수
+      // → State 타입이 자동 추론되어 별도 타입 정의 불필요
+      combine({ count: 0 }, (set, get) => ({
+        actions: {
+          increaseOne: () => {
+            set((state) => {
+              state.count++;
+            });
+          },
+          decreaseOne: () => {
+            set((state) => {
+              state.count--;
+            });
+          },
         },
-        decreaseOne: () => {
-          set((state) => {
-            state.count--;
-          });
-        },
-      },
-    })),
+      })),
+    ),
   ),
+);
+
+// count 값이 변경될 때마다 리스너 실행
+useCountStore.subscribe(
+  (store) => store.count, // 셀렉터: 구독 대상
+  (count, prevCount) => {
+    // 리스너: 변경 시 실행
+    console.log(count, prevCount);
+  },
 );
 
 // type Store = {
