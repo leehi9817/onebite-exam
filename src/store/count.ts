@@ -1,28 +1,52 @@
 import { create } from "zustand";
-import { combine, subscribeWithSelector } from "zustand/middleware";
+import {
+  combine,
+  subscribeWithSelector,
+  persist,
+  createJSONStorage,
+  devtools,
+} from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 export const useCountStore = create(
-  subscribeWithSelector(
-    // ✅ immer 덕분에 직접 값을 변경하는 방식으로 작성 가능
-    immer(
-      // combine: 첫 번째 인수 = State, 두 번째 인수 = 액션 함수
-      // → State 타입이 자동 추론되어 별도 타입 정의 불필요
-      combine({ count: 0 }, (set, get) => ({
-        actions: {
-          increaseOne: () => {
-            set((state) => {
-              state.count++;
-            });
-          },
-          decreaseOne: () => {
-            set((state) => {
-              state.count--;
-            });
-          },
-        },
-      })),
+  devtools(
+    // devtools: 스토어 값의 변화를 실시간으로 디버깅
+    // Redux DevTools 크롬 확장 프로그램과 함께 사용
+    persist(
+      // persist: 현재 스토어의 State를 브라우저 로컬 스토리지에 자동 보관
+      subscribeWithSelector(
+        // immer: 직접 값을 변경하는 방식으로 작성 가능
+        immer(
+          // combine: 첫 번째 인수 = State, 두 번째 인수 = 액션 함수
+          // → State 타입이 자동 추론되어 별도 타입 정의 불필요
+          combine({ count: 0 }, (set, get) => ({
+            actions: {
+              increaseOne: () => {
+                set((state) => {
+                  state.count++;
+                });
+              },
+              decreaseOne: () => {
+                set((state) => {
+                  state.count--;
+                });
+              },
+            },
+          })),
+        ),
+      ),
+      {
+        name: "countStore", // 로컬 스토리지 키 이름
+        // ⚠️ 함수는 JSON 파싱 불가 → State만 선택적으로 보관
+        partialize: (store) => ({
+          count: store.count,
+        }),
+        storage: createJSONStorage(() => sessionStorage), // 로컬 스토리지 대신 세션 스토리지에 저장
+      },
     ),
+    {
+      name: "countStore", // DevTools에 표시될 이름
+    },
   ),
 );
 
