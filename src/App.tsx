@@ -1,10 +1,10 @@
 import { Routes, Route, Outlet } from "react-router";
 import "./App.css";
-import IndexPage from "@/pages/IndexPage";
-import CounterPage from "@/pages/CounterPage";
-import SignInPage from "@/pages/SignInPage";
-import SignUpPage from "@/pages/SignUpPage";
-import TodoListPage from "@/pages/TodoListPage";
+import IndexPage from "@/pages/index-page";
+import CounterPage from "@/pages/counter-page";
+import SignInPage from "@/pages/sign-in-page";
+import SignUpPage from "@/pages/sign-up-page";
+import TodoListPage from "@/pages/todo-list-page";
 
 function AuthLayout() {
   return (
