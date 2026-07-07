@@ -11,8 +11,7 @@ export function useCreateTodoMutation() {
     onMutate: () => {},
     onSettled: () => {},
     onSuccess: (newTodo) => {
-      const queryKey = QUERY_KEYS.todo.list;
-      queryClient.setQueryData<Todo[]>(queryKey, (prevTodos) => {
+      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (prevTodos) => {
         if (!prevTodos) return [newTodo];
         return [...prevTodos, newTodo];
       });
