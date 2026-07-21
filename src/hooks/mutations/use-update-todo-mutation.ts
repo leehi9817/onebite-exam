@@ -8,31 +8,32 @@ export function useUpdateTodoMutation() {
 
   return useMutation({
     mutationFn: updateTodo,
-    onMutate: (updatedTodo) => {
-      queryClient.cancelQueries({ queryKey: QUERY_KEYS.todo.list });
-
-      const prevTodos = queryClient.getQueryData<Todo[]>(QUERY_KEYS.todo.list);
-      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (prevTodos) => {
-        if (!prevTodos) return [];
-        return prevTodos.map((prevTodo) =>
-          prevTodo.id === updatedTodo.id
-            ? { ...prevTodo, ...updatedTodo }
-            : prevTodo,
-        );
+    onMutate: async (updatedTodo) => {
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.todo.detail(updatedTodo.id),
       });
 
-      return { prevTodos };
+      const prevTodo = queryClient.getQueryData<Todo>(
+        QUERY_KEYS.todo.detail(updatedTodo.id),
+      );
+
+      queryClient.setQueryData<Todo>(
+        QUERY_KEYS.todo.detail(updatedTodo.id),
+        (prevTodo) => {
+          if (!prevTodo) return;
+          return { ...prevTodo, ...updatedTodo };
+        },
+      );
+
+      return { prevTodo };
     },
     onError: (error, variable, context) => {
-      if (context && context.prevTodos) {
-        queryClient.setQueryData<Todo[]>(
-          QUERY_KEYS.todo.list,
-          context.prevTodos,
+      if (context && context.prevTodo) {
+        queryClient.setQueryData<Todo>(
+          QUERY_KEYS.todo.detail(context.prevTodo.id),
+          context.prevTodo,
         );
       }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.todo.list });
     },
   });
 }
